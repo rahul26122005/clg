@@ -26,7 +26,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
 from .forms import UserRegisterForm
-#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
+
+
+
 @login_required
 def home(request):
     return render(request, 'home.html')
