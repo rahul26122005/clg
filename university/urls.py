@@ -5,7 +5,7 @@ from .views import home, register
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('home/', views.home, name='home'),
     path('register/', views.register, name='register'),
     path('group_specific/', views.group_specific_view, name='group_specific'),
     path('upload_students/', views.upload_student_file, name='upload_students'),

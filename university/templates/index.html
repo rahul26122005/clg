@@ -1,0 +1,58 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management System</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Welcome to Attendance Management System</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Upload Students</h2>
+                <p>Upload an Excel file containing student information:</p>
+                <form method="post" enctype="multipart/form-data" action="{% url 'upload_students' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Upload File</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h2>Search Students</h2>
+                <p>Search for students by name:</p>
+                <form method="get" action="{% url 'search_students' %}">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="query" placeholder="Enter student name">
+                    </div>
+                    <button type="submit" class="btn btn-success">Search</button>
+                </form>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <h2 class="mt-5">Other Options</h2>
+        <ul>
+            <li><a href="{% url 'home' %}" class="btn btn-info">Home</a></li>
+            <li><a href="{% url 'generate_report' %}" class="btn btn-info">Generate Attendance Report</a></li>
+            
+            <li><a href="{% url 'download_template' %}" class="btn btn-secondary">Download Student Template</a></li>
+        </ul>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+
+

@@ -12,7 +12,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from datetime import date
 from .models import Myclass
-from .forms import MonthYearForm, UploadFileForm, UserCreationForm
+from .forms import MonthYearClassSectionForm, UploadFileForm, UserCreationForm
 from collections import defaultdict
 from university.models import Student
 from datetime import datetime, timedelta 
@@ -27,7 +27,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
 from .forms import UserRegisterForm
 
-
+@login_required
+def index(request):
+    return render(request, 'index.html')
 
 @login_required
 def home(request):
@@ -37,7 +39,7 @@ def home(request):
 def group_specific_view(request):
     return render(request, 'group_specific.html')
 
-
+@login_required
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -54,7 +56,7 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'signup.html', {'form': form})
 
-
+@login_required
 def upload_student_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -89,39 +91,53 @@ def upload_student_file(request):
     
     return render(request, 'upload_students.html', {'form': form})
 
+@login_required
 def success(request):
     return HttpResponse("Students uploaded successfully!")
 
+@login_required
 def generate_individual_reports(request):
-    students = Student.objects.all()
-    for student in students:
-        workbook = openpyxl.Workbook()
-        sheet = workbook.active
-        sheet.title = 'Student Report'
 
-        # Set up headers
-        sheet['A1'] = 'Student Report'
-        sheet['A1'].font = Font(size=14, bold=True)
-        sheet['A1'].alignment = Alignment(horizontal='center')
-        sheet.merge_cells('A1:D1')
+        month = int(request.POST.get('month'))
+        year = int(request.POST.get('year'))
+        student_class = request.POST.get('student_class')
+        section = request.POST.get('section')
 
-        sheet['A2'] = 'Name:'
-        sheet['B2'] = student.name
-        sheet['A3'] = 'Roll Number:'
-        sheet['B3'] = student.roll_number
-        sheet['A4'] = 'Class:'
-        sheet['B4'] = student.student_class
-        sheet['A5'] = 'Section:'
-        sheet['B5'] = student.section
+        students = Student.objects.filter(student_class=student_class, section=section)
+        for student in students:
+            workbook = openpyxl.Workbook()
+            sheet = workbook.active
+            sheet.title = 'Student Report'
+            # Set up headers
+            sheet['A1'] = 'Student Report'
+            sheet['A1'].font = Font(size=14, bold=True)
+            sheet['A1'].alignment = Alignment(horizontal='center')
+            sheet.merge_cells('A1:D1')
+
+            sheet['A2'] = 'Name:'
+            sheet['B2'] = student.name
+            sheet['A3'] = 'Roll Number:'
+            sheet['B3'] = student.roll_number
+            sheet['A4'] = 'Class:'
+            sheet['B4'] = student.student_class
+            sheet['A5'] = 'Section:'
+            sheet['B5'] = student.section
 
         for col_num in range(1, 5):
             sheet.column_dimensions[get_column_letter(col_num)].width = 20
 
+
+        # Save the report to a byte stream
         # Save each report
         file_name = f'student_report_{student.roll_number}.xlsx'
         workbook.save(file_name)
 
-    return HttpResponse("Reports generated successfully!")
+        # Create the HTTP response with the appropriate headers
+        return HttpResponse("Reports generated successfully!")
+
+
+
+@login_required     
 def download_template(request):
     file_path = os.path.join('C:/Users/welcome/Desktop/project/college/university/templates/', 'student_template.xlsx')
     return FileResponse(open(file_path, 'rb'), as_attachment=True, filename='student_template.xlsx')
@@ -169,14 +185,16 @@ def view1(request):
         'selected_section': selected_section
     })
 
-
+@login_required
 def view2(request):
     
     if request.method == 'POST':
-        form = MonthYearForm(request.POST)
+        form = MonthYearClassSectionForm(request.POST)
         if form.is_valid():
             month = form.cleaned_data['month']
             year = form.cleaned_data['year']
+            student_class = form.cleaned_data['student_class']
+            section = form.cleaned_data['section']
 
             # Create a new workbook and select the active sheet
             workbook = openpyxl.Workbook()
@@ -216,7 +234,7 @@ def view2(request):
                     cell.fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
 
             # Fill in the attendance data
-            students = Student.objects.all()
+            students = Student.objects.filter(student_class=student_class, section=section)
             for row_num, student in enumerate(students, 6):
                 sheet.cell(row=row_num, column=1).value = student.name
                 sheet.cell(row=row_num, column=2).value = student.roll_number
@@ -252,6 +270,6 @@ def view2(request):
             workbook.save(response)
             return response
     else:
-        form = MonthYearForm()
+        form = MonthYearClassSectionForm()
 
     return render(request, 'generate_report.html', {'form': form})
