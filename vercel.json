@@ -27,5 +27,8 @@
             "src": "/(.*)",
             "dest": "clg_projects/wsgi.py"
         }
+    ],
+    "rewrites":[
+        {"source": "/(.*)", "destination": "/"}
     ]
 }
