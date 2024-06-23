@@ -1,12 +1,5 @@
 {
     "version": 2,
-    "functions": {
-      "api/*": {
-        "runtime": "python3.8",
-        "memory": 1024,
-        "maxDuration": 10
-      }
-    },
     "builds": [
       {
         "src": "manage.py",
@@ -14,7 +7,13 @@
       }
     ],
     "routes": [
-      { "src": "/(.*)", "dest": "/api/$1" }
-    ]
+      {
+        "src": "/(.*)",
+        "dest": "manage.py"
+      }
+    ],
+    "scripts": {
+        "build": "django-admin collectstatic --noinput"
+      }
   }
   
