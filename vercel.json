@@ -3,17 +3,18 @@
     "builds": [
       {
         "src": "manage.py",
-        "use": "@vercel/python"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "manage.py"
+        "use": "@vercel/python",
+        "config": { "maxLambdaSize": "50mb" }
       }
     ],
     "scripts": {
-        "build": "django-admin collectstatic --noinput"
+        "postinstall": "python manage.py collectstatic --noinput"
+      },
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/"
       }
+    ]
   }
   
