@@ -10,7 +10,7 @@
     "scripts": {
         "postinstall": "python manage.py collectstatic --noinput"
       },
-    "routes": [
+    "rewrite": [
       {
         "src": "/(.*)",
         "dest": "/"
